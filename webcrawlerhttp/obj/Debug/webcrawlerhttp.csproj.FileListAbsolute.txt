@@ -1,0 +1,16 @@
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\bin\Debug\webcrawlerhttp.exe.config
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\bin\Debug\webcrawlerhttp.exe
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\bin\Debug\webcrawlerhttp.pdb
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.csproj.AssemblyReference.cache
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.csproj.SuggestedBindingRedirects.cache
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\MainWindow.g.cs
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\App.g.cs
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp_MarkupCompile.cache
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp_MarkupCompile.lref
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\MainWindow.baml
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.g.resources
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.Properties.Resources.resources
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.csproj.GenerateResource.cache
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.csproj.CoreCompileInputs.cache
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.exe
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.pdb
