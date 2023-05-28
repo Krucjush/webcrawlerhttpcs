@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,38 @@ namespace webcrawlerhttp
 {
 	public class Crawl
 	{
-		public List<string> getURLsFromHTML(string htmlBody, string baseURL)
+		public async void CrawlPage(string currentURL)
+		{
+			MessageBox.Show($"actively crawling {currentURL}");
+			try
+			{
+				var httpClient = new HttpClient();
+				var resp = await httpClient.GetAsync(currentURL);
+
+				if ((int)resp.StatusCode > 399)
+				{
+					MessageBox.Show($"error in fetch with status code: {(int)resp.StatusCode} on page: {currentURL}");
+				}
+				else
+				{
+					var contentType = resp.Content.Headers.GetValues("Content-Type").FirstOrDefault();
+					if (!contentType.Contains("text/html"))
+					{
+						MessageBox.Show($"non html response, content type: {contentType}, on page: {currentURL}");
+					}
+					else
+					{
+						MessageBox.Show(await resp.Content.ReadAsStringAsync());
+					}
+				}
+			}
+			catch (Exception err)
+			{
+				MessageBox.Show($"error in fetch: {err.Message}, on page {currentURL}");
+			}
+		}
+
+		public List<string> GetURLsFromHTML(string htmlBody, string baseURL)
 		{
 			var urls = new List<string>();
 			var dom = new HtmlDocument();
@@ -53,7 +85,7 @@ namespace webcrawlerhttp
 			return urls;
 		}
 
-		public string normalizeURL(string urlString)
+		public string NormalizeURL(string urlString)
 		{
 			var urlObj = new Uri(urlString);
 			var hostPath = $"{urlObj.Host}{urlObj.AbsolutePath}";
