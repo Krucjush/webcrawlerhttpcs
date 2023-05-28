@@ -20,12 +20,25 @@ namespace webcrawlerhttp
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		public string Text = "https://blog.boot.dev/path";
+		public string Text { get; set; }
 		private Crawl _crawl = new Crawl();
 		public MainWindow()
 		{
 			InitializeComponent();
-			MessageBox.Show(Text);
+			DataContext = this;
+		}
+
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			var http = "\"https://blog.boot.dev/path1/\"";
+			var relative = "\"/path2/\"";
+			var html = $"<html>\r\n    <body>\r\n        <a href={http}>\r\n  <a href={relative}>\r\n           Boot.dev Blog\r\n        </a>\r\n    </body>\r\n</html>";
+			var output = "Output:\n";
+			foreach (var item in _crawl.getURLsFromHTML(html, http))
+			{
+				output+= item + "\n";
+			}
+			MessageBox.Show(output);
 		}
 	}
 }

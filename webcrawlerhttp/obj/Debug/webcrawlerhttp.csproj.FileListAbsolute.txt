@@ -14,3 +14,7 @@ C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawler
 C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.csproj.CoreCompileInputs.cache
 C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.exe
 C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.pdb
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\bin\Debug\HtmlAgilityPack.dll
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\bin\Debug\HtmlAgilityPack.pdb
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\bin\Debug\HtmlAgilityPack.xml
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.csproj.CopyComplete
