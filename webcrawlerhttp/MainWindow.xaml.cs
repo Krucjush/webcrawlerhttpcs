@@ -28,7 +28,7 @@ namespace webcrawlerhttp
 			DataContext = this;
 		}
 
-		private void Button_Click(object sender, RoutedEventArgs e)
+		private async void Button_Click(object sender, RoutedEventArgs e)
 		{
 			const string noWeb = "no website provided";
 			if (Text == null)
@@ -46,7 +46,14 @@ namespace webcrawlerhttp
 			else
 			{
 				MessageBox.Show($"starting crawl of {Text}");
-				_crawl.CrawlPage(Text);
+				var task = _crawl.CrawlPage(Text, Text, new Dictionary<string, int>());
+				var pages = await task;
+				var output = "Output:\n";
+				foreach (KeyValuePair<string, int> page in pages)
+				{
+					output += page.ToString() + "\n";
+				}
+				MessageBox.Show(output);
 			}
 		}
 	}

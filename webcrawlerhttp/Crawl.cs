@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -12,9 +13,26 @@ namespace webcrawlerhttp
 {
 	public class Crawl
 	{
-		public async void CrawlPage(string currentURL)
+		public async Task<Dictionary<string, int>> CrawlPage(string baseURL, string currentURL, Dictionary<string, int> pages)
 		{
-			MessageBox.Show($"actively crawling {currentURL}");
+			var baseURLObj = new Uri(baseURL);
+			var currentURLObj = new Uri(currentURL);
+			if (baseURLObj.Host != currentURLObj.Host)
+			{
+				return pages;
+			}
+
+			var normalizedCurrentURL = NormalizeURL(currentURL);
+			if (pages.TryGetValue(normalizedCurrentURL, out int count))
+			{
+				pages[normalizedCurrentURL] = count + 1;
+				return pages;
+			}
+
+			pages[normalizedCurrentURL] = 1;
+
+			//MessageBox.Show($"actively crawling {currentURL}");
+
 			try
 			{
 				var httpClient = new HttpClient();
@@ -23,24 +41,29 @@ namespace webcrawlerhttp
 				if ((int)resp.StatusCode > 399)
 				{
 					MessageBox.Show($"error in fetch with status code: {(int)resp.StatusCode} on page: {currentURL}");
+					return pages;
 				}
-				else
+				var contentType = resp.Content.Headers.GetValues("Content-Type").FirstOrDefault();
+				if (!contentType.Contains("text/html"))
 				{
-					var contentType = resp.Content.Headers.GetValues("Content-Type").FirstOrDefault();
-					if (!contentType.Contains("text/html"))
-					{
-						MessageBox.Show($"non html response, content type: {contentType}, on page: {currentURL}");
-					}
-					else
-					{
-						MessageBox.Show(await resp.Content.ReadAsStringAsync());
-					}
+					MessageBox.Show($"non html response, content type: {contentType}, on page: {currentURL}");
+					return pages;
+				}
+
+				var htmlBody = await resp.Content.ReadAsStringAsync();
+
+				var nextURLs = GetURLsFromHTML(htmlBody, baseURL);
+
+				foreach ( var nextURL in nextURLs )
+				{
+					pages = await CrawlPage(baseURL, nextURL, pages);
 				}
 			}
 			catch (Exception err)
 			{
 				MessageBox.Show($"error in fetch: {err.Message}, on page {currentURL}");
 			}
+			return pages;
 		}
 
 		public List<string> GetURLsFromHTML(string htmlBody, string baseURL)
@@ -59,8 +82,8 @@ namespace webcrawlerhttp
 						//relative
 						try
 						{
-							var urlObj = new Uri(baseURL.Substring(1, baseURL.Length - 2) + href);
-							urls.Add(urlObj.Host + urlObj.AbsolutePath);
+							var urlObj = new Uri(baseURL + href);
+							urls.Add(urlObj.Scheme + "://" + urlObj.Host + urlObj.AbsolutePath);
 						}
 						catch (Exception err)
 						{
@@ -73,7 +96,7 @@ namespace webcrawlerhttp
 						try
 						{
 							var urlObj = new Uri(href);
-							urls.Add(urlObj.Host + urlObj.AbsolutePath);
+							urls.Add(urlObj.Scheme + "://" + urlObj.Host + urlObj.AbsolutePath);
 						}
 						catch (Exception err)
 						{
