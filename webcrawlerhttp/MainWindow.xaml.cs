@@ -22,6 +22,7 @@ namespace webcrawlerhttp
 	{
 		public string Text { get; set; }
 		private Crawl _crawl = new Crawl();
+		private Report _report = new Report();
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -48,12 +49,8 @@ namespace webcrawlerhttp
 				MessageBox.Show($"starting crawl of {Text}");
 				var task = _crawl.CrawlPage(Text, Text, new Dictionary<string, int>());
 				var pages = await task;
-				var output = "Output:\n";
-				foreach (KeyValuePair<string, int> page in pages)
-				{
-					output += page.ToString() + "\n";
-				}
-				MessageBox.Show(output);
+				var sortedPages = _report.PrintReport(pages);
+				MessageBox.Show(sortedPages);
 			}
 		}
 	}
