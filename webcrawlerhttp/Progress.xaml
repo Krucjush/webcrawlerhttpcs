@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:webcrawlerhttp"
         mc:Ignorable="d"
-        Title="Progress" Height="100" Width="200">
+        Title="Progress" Height="100" Width="210">
     <Grid>
         <ProgressBar x:Name="progressBar" IsIndeterminate="True" Width="200" Height="20"/>
     </Grid>

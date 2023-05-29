@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -40,9 +41,9 @@ namespace webcrawlerhttp
 			{
 				MessageBox.Show("no website provided");
 			}
-			else if (Text.Contains(' '))
+			else if (!IsUrlValid(Text))
 			{
-				MessageBox.Show("too many arguments provided");
+				MessageBox.Show("wrong input");
 			}
 			else
 			{
@@ -53,6 +54,16 @@ namespace webcrawlerhttp
 				var sortedPages = _report.PrintReport(pages);
 				MessageBox.Show(sortedPages);
 			}
+		}
+		public bool IsUrlValid(string urlString)
+		{
+			var pattern = @"^(http|https)://";
+
+			var regex = new Regex(pattern, RegexOptions.IgnoreCase);
+
+			var match = regex.Match(urlString);
+
+			return match.Success;
 		}
 		private async void ShowProgress(Progress progress)
 		{
