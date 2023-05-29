@@ -36,8 +36,8 @@ namespace webcrawlerhttp
 			try
 			{
 				var httpClient = new HttpClient();
+				httpClient.Timeout = TimeSpan.FromSeconds(10);
 				var resp = await httpClient.GetAsync(currentURL);
-
 				if ((int)resp.StatusCode > 399)
 				{
 					MessageBox.Show($"error in fetch with status code: {(int)resp.StatusCode} on page: {currentURL}");
@@ -46,7 +46,7 @@ namespace webcrawlerhttp
 				var contentType = resp.Content.Headers.GetValues("Content-Type").FirstOrDefault();
 				if (!contentType.Contains("text/html"))
 				{
-					MessageBox.Show($"non html response, content type: {contentType}, on page: {currentURL}");
+					//MessageBox.Show($"non html response, content type: {contentType}, on page: {currentURL}");
 					return pages;
 				}
 
@@ -55,14 +55,18 @@ namespace webcrawlerhttp
 
 				var nextURLs = GetURLsFromHTML(htmlBody, baseURL);
 
-				foreach ( var nextURL in nextURLs )
+				foreach (var nextURL in nextURLs)
 				{
 					pages = await CrawlPage(baseURL, nextURL, pages);
 				}
 			}
-			catch (Exception err)
+			catch (TaskCanceledException ex)
 			{
-				MessageBox.Show($"error in fetch: {err.Message}, on page {currentURL}");
+				MessageBox.Show($"The request timed out: {ex.Message}");
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"error in fetch: {ex.Message}, on page {currentURL}");
 			}
 			return pages;
 		}

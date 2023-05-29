@@ -27,18 +27,18 @@ namespace webcrawlerhttp
 		{
 			InitializeComponent();
 			DataContext = this;
+			
 		}
 
 		private async void Button_Click(object sender, RoutedEventArgs e)
 		{
-			const string noWeb = "no website provided";
-			if (Text == null)
+			var progressDialog = new Progress
 			{
-				MessageBox.Show(noWeb);
-			}
-			else if (Text.Length < 1)
+				Owner = this
+			};
+			if (Text == null || Text.Length < 1)
 			{
-				MessageBox.Show(noWeb);
+				MessageBox.Show("no website provided");
 			}
 			else if (Text.Contains(' '))
 			{
@@ -47,11 +47,17 @@ namespace webcrawlerhttp
 			else
 			{
 				MessageBox.Show($"starting crawl of {Text}");
-				var task = _crawl.CrawlPage(Text, Text, new Dictionary<string, int>());
-				var pages = await task;
+				ShowProgress(progressDialog);
+				var pages = await Task.Run(() => _crawl.CrawlPage(Text, Text, new Dictionary<string, int>()));
+				progressDialog.Close();
 				var sortedPages = _report.PrintReport(pages);
 				MessageBox.Show(sortedPages);
 			}
+		}
+		private async void ShowProgress(Progress progress)
+		{
+			await Task.Delay(100);
+			progress.Show();
 		}
 	}
 }
