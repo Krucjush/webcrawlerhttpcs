@@ -72,5 +72,18 @@ namespace webcrawlerhttp
 			await Task.Delay(100);
 			progress.Show();
 		}
+
+		private async void Button_Click_1(object sender, RoutedEventArgs e)
+		{
+			var progressDialog = new Progress 
+			{ 
+				Owner = this 
+			};
+			ShowProgress(progressDialog);
+			var pages = await Task.Run(() => _crawl.CrawlPage(Text, Text, new Crawl { Pages = new Dictionary<string, int>() }));
+			progressDialog.Close();
+			var csvContent = _report.GenerateCsvReport(pages.Pages);
+			await _report.SaveReportAsCsv(csvContent);
+		}
 	}
 }
