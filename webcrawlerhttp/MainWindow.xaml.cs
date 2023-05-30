@@ -22,6 +22,8 @@ namespace webcrawlerhttp
 	public partial class MainWindow : Window
 	{
 		public string Text { get; set; }
+		public int ExternalLinksCount { get; set; }
+		public int InternalLinksCount { get; set; }
 		private Crawl _crawl = new Crawl();
 		private Report _report = new Report();
 		public MainWindow()
@@ -49,7 +51,7 @@ namespace webcrawlerhttp
 			{
 				MessageBox.Show($"starting crawl of {Text}");
 				ShowProgress(progressDialog);
-				var pages = await Task.Run(() => _crawl.CrawlPage(Text, Text, new Dictionary<string, int>()));
+				var pages = await Task.Run(() => _crawl.CrawlPage(Text, Text, new Crawl { Pages = new Dictionary<string, int>() }));
 				progressDialog.Close();
 				var sortedPages = _report.PrintReport(pages);
 				MessageBox.Show(sortedPages);

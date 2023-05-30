@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:webcrawlerhttp"
         mc:Ignorable="d"
-        Title="Progress" Height="100" Width="210">
+        Title="Loading" Height="100" Width="210">
     <Grid>
+        <AccessText HorizontalAlignment="Center">Fetching Data</AccessText>
         <ProgressBar x:Name="progressBar" IsIndeterminate="True" Width="200" Height="20"/>
     </Grid>
 </Window>

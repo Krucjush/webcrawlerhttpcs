@@ -14,23 +14,26 @@ namespace webcrawlerhttp
 {
 	public class Crawl
 	{
-		public async Task<Dictionary<string, int>> CrawlPage(string baseURL, string currentURL, Dictionary<string, int> pages)
+		public Dictionary<string, int> Pages { get; set; }
+		public int ExternalLinksCount { get; set; }
+		public int InternalLinksCount { get; set; }
+		public async Task<Crawl> CrawlPage(string baseURL, string currentURL, Crawl crawl)
 		{
 			var baseURLObj = new Uri(baseURL);
 			var currentURLObj = new Uri(currentURL);
 			if (baseURLObj.Host != currentURLObj.Host)
 			{
-				return pages;
+				return crawl;
 			}
 
 			var normalizedCurrentURL = NormalizeURL(currentURL);
-			if (pages.TryGetValue(normalizedCurrentURL, out int count))
+			if (crawl.Pages.TryGetValue(normalizedCurrentURL, out int count))
 			{
-				pages[normalizedCurrentURL] = count + 1;
-				return pages;
+				crawl.Pages[normalizedCurrentURL] = count + 1;
+				return crawl;
 			}
 
-			pages[normalizedCurrentURL] = 1;
+			crawl.Pages[normalizedCurrentURL] = 1;
 
 			//MessageBox.Show($"actively crawling {currentURL}");
 
@@ -42,13 +45,13 @@ namespace webcrawlerhttp
 				if ((int)resp.StatusCode > 399)
 				{
 					MessageBox.Show($"error in fetch with status code: {(int)resp.StatusCode} on page: {currentURL}");
-					return pages;
+					return crawl;
 				}
 				var contentType = resp.Content.Headers.GetValues("Content-Type").FirstOrDefault();
 				if (!contentType.Contains("text/html"))
 				{
 					//MessageBox.Show($"non html response, content type: {contentType}, on page: {currentURL}");
-					return pages;
+					return crawl;
 				}
 
 
@@ -58,7 +61,16 @@ namespace webcrawlerhttp
 
 				foreach (var nextURL in nextURLs)
 				{
-					pages = await CrawlPage(baseURL, nextURL, pages);
+					if (IsInternalLink(baseURL, nextURL))
+					{
+						crawl.InternalLinksCount++;
+					}
+					else
+					{
+						crawl.ExternalLinksCount++;
+					}
+					crawl = await CrawlPage(baseURL, nextURL, crawl);
+
 				}
 			}
 			catch (TaskCanceledException ex)
@@ -69,7 +81,7 @@ namespace webcrawlerhttp
 			{
 				MessageBox.Show($"error in fetch: {ex.Message}, on page {currentURL}");
 			}
-			return pages;
+			return crawl;
 		}
 
 		public List<string> GetURLsFromHTML(string htmlBody, string baseURL)
@@ -123,6 +135,13 @@ namespace webcrawlerhttp
 				return hostPath.Substring(0, hostPath.Length-1);
 			}
 			return hostPath;
+		}
+
+		public bool IsInternalLink(string baseURL, string link)
+		{
+			var baseUri = new Uri(baseURL);
+			var linkUri = new Uri(link);
+			return baseUri.Host == linkUri.Host;
 		}
 	}
 }

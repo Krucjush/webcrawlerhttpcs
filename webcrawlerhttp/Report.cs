@@ -8,18 +8,22 @@ namespace webcrawlerhttp
 {
 	public class Report
 	{
-		public string PrintReport(Dictionary<string, int> pages)
+		public string PrintReport(Crawl crawl)
 		{
 			var output = "=========\n" +
 						 "REPORT\n" +
 						 "=========\n";
-			var sortedPages = SortPages(pages);
+			var sortedPages = SortPages(crawl.Pages);
 			foreach (var sortedPage in sortedPages)
 			{
 				var url = sortedPage.Key;
 				var hits = sortedPage.Value;
 				output += $"Found {hits} links to page: {url}\n";
 			}
+
+			output += $"Total external links: {crawl.ExternalLinksCount}\n";
+			output += $"Total internal links: {crawl.InternalLinksCount}\n";
+
 			return output += "=========\n" +
 							 "END REPORT\n" +
 							 "=========\n";
