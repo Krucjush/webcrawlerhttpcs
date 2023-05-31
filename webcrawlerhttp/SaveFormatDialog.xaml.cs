@@ -43,7 +43,8 @@ namespace webcrawlerhttp
 				ShowProgress(progressDialog);
 				var pages = await Task.Run(() => _crawl.CrawlPage(_text, _text, new Crawl { Pages = new Dictionary<string, int>() }));
 				progressDialog.Close();
-				await _report.SaveReportAsXml(pages.Pages);
+				var xmlContent = _report.GenerateXmlReport(pages);
+				await _report.SaveReportAsXml(System.Net.WebUtility.HtmlDecode(xmlContent));
 			}
 			else if (csvRadioButton.IsChecked == true)
 			{
@@ -54,7 +55,7 @@ namespace webcrawlerhttp
 				ShowProgress(progressDialog);
 				var pages = await Task.Run(() => _crawl.CrawlPage(_text, _text, new Crawl { Pages = new Dictionary<string, int>() }));
 				progressDialog.Close();
-				var csvContent = _report.GenerateCsvReport(pages.Pages);
+				var csvContent = _report.GenerateCsvReport(pages);
 				await _report.SaveReportAsCsv(csvContent);
 			}
 			else if (jsonRadioButton.IsChecked == true)
@@ -66,7 +67,8 @@ namespace webcrawlerhttp
 				ShowProgress(progressDialog);
 				var pages = await Task.Run(() => _crawl.CrawlPage(_text, _text, new Crawl { Pages = new Dictionary<string, int>() }));
 				progressDialog.Close();
-				await _report.SaveReportAsJson(pages.Pages);
+				var jsonContent = _report.GenerateJsonReport(pages);
+				await _report.SaveReportAsJson(jsonContent);
 			}
 			else 
 			{

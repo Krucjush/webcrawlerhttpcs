@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace webcrawlerhttp
@@ -15,7 +16,32 @@ namespace webcrawlerhttp
 	{
 		private System.Windows.Forms.SaveFileDialog SaveFileDialog = new System.Windows.Forms.SaveFileDialog();
 
-		public async Task SaveReportAsXml(Dictionary<string, int> pages)
+		public string GenerateXmlReport(Crawl crawl)
+		{
+			var xmlContent = new XElement("Report");
+
+			var sortedPages = SortPages(crawl.Pages);
+
+			foreach (var sortedPage in sortedPages)
+			{
+				var url = sortedPage.Key;
+				var hits = sortedPage.Value;
+
+				var pageElement = new XElement("Page",
+					new XElement("URL", url),
+					new XElement("Hits", hits)
+				);
+
+				xmlContent.Add(pageElement);
+			}
+
+			xmlContent.Add(new XElement("InternalLinksCount", crawl.InternalLinksCount));
+			xmlContent.Add(new XElement("ExternalLinksCount", crawl.ExternalLinksCount));
+
+			return xmlContent.ToString();
+		}
+
+		public async Task SaveReportAsXml(string pages)
 		{
 			SaveFileDialog.Filter = "XML File|*.xml";
 			SaveFileDialog.Title = "Save Report as XML";
@@ -27,10 +53,9 @@ namespace webcrawlerhttp
 
 				try
 				{
-					var serializer = new XmlSerializer(pages.GetType());
 					using (var writer = new StreamWriter(filePath))
 					{
-						await Task.Run(() => serializer.Serialize(writer, pages));
+						await writer.WriteAsync(pages);
 					}
 					MessageBox.Show("Report saved as XML successfully.");
 				}
@@ -41,11 +66,32 @@ namespace webcrawlerhttp
 			}
 		}
 
+		public Dictionary<string, int> GenerateJsonReport(Crawl crawl)
+		{
+			var report = new Dictionary<string, int>();
+
+			var sortedPages = SortPages(crawl.Pages);
+
+			foreach (var sortedPage in sortedPages)
+			{
+				report[sortedPage.Key] = sortedPage.Value;
+			}
+
+			report["InternalLinksCount"] = crawl.InternalLinksCount;
+			report["ExternalLinksCount"] = crawl.ExternalLinksCount;
+
+			return report;
+		}
+
 		public async Task SaveReportAsJson(Dictionary<string, int> pages)
 		{
 			SaveFileDialog.Filter = "JSON File|*.json";
 			SaveFileDialog.Title = "Save Report as JSON";
 			SaveFileDialog.FileName = "report.json"; // Default file name
+			var jsonSettings = new JsonSerializerSettings
+			{
+				StringEscapeHandling = StringEscapeHandling.EscapeHtml
+			};
 
 			if (SaveFileDialog.ShowDialog() == DialogResult.OK)
 			{
@@ -53,7 +99,7 @@ namespace webcrawlerhttp
 
 				try
 				{
-					var jsonContent = JsonConvert.SerializeObject(pages, Formatting.Indented);
+					var jsonContent = JsonConvert.SerializeObject(pages, Formatting.Indented, jsonSettings);
 					using (var writer = new StreamWriter(filePath))
 					{
 						await writer.WriteAsync(jsonContent);
@@ -67,11 +113,11 @@ namespace webcrawlerhttp
 			}
 		}
 
-		public string GenerateCsvReport(Dictionary<string, int> pages)
+		public string GenerateCsvReport(Crawl crawl)
 		{
 			var csvContent = "URL,Hits\n";
 
-			var sortedPages = SortPages(pages);
+			var sortedPages = SortPages(crawl.Pages);
 
 			foreach (var sortedPage in sortedPages)
 			{
@@ -79,7 +125,9 @@ namespace webcrawlerhttp
 				var hits = sortedPage.Value;
 				csvContent += $"{url},{hits}\n";
 			}
-			
+			csvContent += $"internal links count,{crawl.InternalLinksCount}\n";
+			csvContent += $"external links count,{crawl.ExternalLinksCount}\n";
+
 			return csvContent;
 		}
 
@@ -121,7 +169,7 @@ namespace webcrawlerhttp
 				output += $"Found {hits} links to page: {url}\n";
 			}
 
-			output += $"Total external links: {crawl.ExternalLinksCount}\n";
+			output += $"\nTotal external links: {crawl.ExternalLinksCount}\n";
 			output += $"Total internal links: {crawl.InternalLinksCount}\n";
 
 			return output += "=========\n" +
