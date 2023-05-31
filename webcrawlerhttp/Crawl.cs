@@ -12,7 +12,7 @@ using System.Windows;
 
 namespace webcrawlerhttp
 {
-	public class Crawl
+	public class Crawl : IReportData
 	{
 		public Dictionary<string, int> Pages { get; set; }
 		public int ExternalLinksCount { get; set; }
@@ -44,7 +44,7 @@ namespace webcrawlerhttp
 				var resp = await httpClient.GetAsync(currentURL);
 				if ((int)resp.StatusCode > 399)
 				{
-					MessageBox.Show($"error in fetch with status code: {(int)resp.StatusCode} on page: {currentURL}");
+					//MessageBox.Show($"error in fetch with status code: {(int)resp.StatusCode} on page: {currentURL}");
 					return crawl;
 				}
 				var contentType = resp.Content.Headers.GetValues("Content-Type").FirstOrDefault();
@@ -105,7 +105,7 @@ namespace webcrawlerhttp
 						}
 						catch (Exception err)
 						{
-							MessageBox.Show($"error with relative url:\n{err.Message}");
+							//MessageBox.Show($"error with relative url:\n{err.Message}");
 						}
 					}
 					else
@@ -118,7 +118,7 @@ namespace webcrawlerhttp
 						}
 						catch (Exception err)
 						{
-							MessageBox.Show($"error with absolute url:\n{err.Message}");
+							//MessageBox.Show($"error with absolute url:\n{err.Message}");
 						}
 					}
 				}

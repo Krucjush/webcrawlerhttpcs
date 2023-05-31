@@ -16,11 +16,11 @@ namespace webcrawlerhttp
 	{
 		private System.Windows.Forms.SaveFileDialog SaveFileDialog = new System.Windows.Forms.SaveFileDialog();
 
-		public string GenerateXmlReport(Crawl crawl)
+		public string GenerateXmlReport<T>(T reportData) where T : IReportData
 		{
 			var xmlContent = new XElement("Report");
 
-			var sortedPages = SortPages(crawl.Pages);
+			var sortedPages = SortPages(reportData.Pages);
 
 			foreach (var sortedPage in sortedPages)
 			{
@@ -35,8 +35,8 @@ namespace webcrawlerhttp
 				xmlContent.Add(pageElement);
 			}
 
-			xmlContent.Add(new XElement("InternalLinksCount", crawl.InternalLinksCount));
-			xmlContent.Add(new XElement("ExternalLinksCount", crawl.ExternalLinksCount));
+			xmlContent.Add(new XElement("InternalLinksCount", reportData.InternalLinksCount));
+			xmlContent.Add(new XElement("ExternalLinksCount", reportData.ExternalLinksCount));
 
 			return xmlContent.ToString();
 		}
@@ -66,7 +66,7 @@ namespace webcrawlerhttp
 			}
 		}
 
-		public Dictionary<string, int> GenerateJsonReport(Crawl crawl)
+		public Dictionary<string, int> GenerateJsonReport<T>(T crawl) where T : IReportData
 		{
 			var report = new Dictionary<string, int>();
 
@@ -113,7 +113,7 @@ namespace webcrawlerhttp
 			}
 		}
 
-		public string GenerateCsvReport(Crawl crawl)
+		public string GenerateCsvReport<T>(T crawl) where T : IReportData
 		{
 			var csvContent = "URL,Hits\n";
 
@@ -156,7 +156,7 @@ namespace webcrawlerhttp
 			}
 		}
 
-		public string PrintReport(Crawl crawl)
+		public string PrintReport<T>(T crawl) where T : IReportData
 		{
 			var output = "=========\n" +
 						 "REPORT\n" +
