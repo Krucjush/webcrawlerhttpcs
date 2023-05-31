@@ -73,17 +73,10 @@ namespace webcrawlerhttp
 			progress.Show();
 		}
 
-		private async void Button_Click_1(object sender, RoutedEventArgs e)
+		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
-			var progressDialog = new Progress 
-			{ 
-				Owner = this 
-			};
-			ShowProgress(progressDialog);
-			var pages = await Task.Run(() => _crawl.CrawlPage(Text, Text, new Crawl { Pages = new Dictionary<string, int>() }));
-			progressDialog.Close();
-			var csvContent = _report.GenerateCsvReport(pages.Pages);
-			await _report.SaveReportAsCsv(csvContent);
+			var saveFormatDialog = new SaveFormatDialog(Text, _crawl, _report);
+			saveFormatDialog.ShowDialog();
 		}
 	}
 }

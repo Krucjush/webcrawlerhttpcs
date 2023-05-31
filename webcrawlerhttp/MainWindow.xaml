@@ -19,7 +19,7 @@
             </Grid.ColumnDefinitions>
             <Button Width="100" HorizontalAlignment="Center" VerticalAlignment="Center" Content="crawl" Click="Button_Click" Margin="10"/>
             <Grid Grid.Column="1">
-                <Button Width="100" HorizontalAlignment="Center" VerticalAlignment="Center" Content="save as csv" Click="Button_Click_1" Margin="10"/>
+                <Button Width="100" HorizontalAlignment="Center" VerticalAlignment="Center" Content="save as..." Click="Button_Click_1" Margin="10"/>
             </Grid>
         </Grid>
     </Grid>

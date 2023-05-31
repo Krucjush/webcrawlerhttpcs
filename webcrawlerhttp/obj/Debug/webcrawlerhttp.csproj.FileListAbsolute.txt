@@ -20,3 +20,7 @@ C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\bin\Debug\HtmlAgilit
 C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\webcrawlerhttp.csproj.CopyComplete
 C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\Progress.g.cs
 C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\Progress.baml
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\bin\Debug\Newtonsoft.Json.dll
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\bin\Debug\Newtonsoft.Json.xml
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\SaveFormatDialog.g.cs
+C:\Users\hiewi\source\repos\webcrawlerhttpcs\webcrawlerhttp\obj\Debug\SaveFormatDialog.baml
