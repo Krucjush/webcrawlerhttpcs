@@ -17,15 +17,19 @@ using System.Windows.Shapes;
 namespace webcrawlerhttp
 {
 	/// <summary>
-	/// Logika interakcji dla klasy MainWindow.xaml
+	/// Represents the main window of the application.
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		/// <summary>
+		/// Gets or sets the text input for crawling.
+		/// </summary>
 		public string Text { get; set; }
-		public int ExternalLinksCount { get; set; }
-		public int InternalLinksCount { get; set; }
-		private Crawl _crawl = new Crawl();
-		private Report _report = new Report();
+		private readonly Crawl _crawl = new Crawl();
+		private readonly Report _report = new Report();
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MainWindow"/> class.
+		/// </summary>
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -33,13 +37,16 @@ namespace webcrawlerhttp
 			
 		}
 
+		/// <summary>
+		/// Event handler for the button click event.
+		/// </summary>
 		private async void Button_Click(object sender, RoutedEventArgs e)
 		{
 			var progressDialog = new Progress
 			{
 				Owner = this
 			};
-			if (Text == null || Text.Length < 1)
+			if (string.IsNullOrEmpty(Text))
 			{
 				MessageBox.Show("no website provided");
 			}
@@ -57,9 +64,15 @@ namespace webcrawlerhttp
 				MessageBox.Show(sortedPages);
 			}
 		}
+
+		/// <summary>
+		/// Checks if the provided URL is valid.
+		/// </summary>
+		/// <param name="urlString">The URL string to validate.</param>
+		/// <returns><c>true</c> if the URL is valid, otherwise <c>false</c>.</returns>
 		public bool IsUrlValid(string urlString)
 		{
-			var pattern = @"^(http|https)://";
+			const string pattern = @"^(http|https)://[a-zA-Z]+.[a-zA-Z]+$";
 
 			var regex = new Regex(pattern, RegexOptions.IgnoreCase);
 
@@ -67,12 +80,20 @@ namespace webcrawlerhttp
 
 			return match.Success;
 		}
-		private async void ShowProgress(Progress progress)
+
+		/// <summary>
+		/// Shows the progress window asynchronously.
+		/// </summary>
+		/// <param name="progress">The progress window to show.</param>
+		public static async void ShowProgress(Window progress)
 		{
 			await Task.Delay(100);
 			progress.Show();
 		}
 
+		/// <summary>
+		/// Event handler for the second button click event.
+		/// </summary>
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
 			var saveFormatDialog = new SaveFormatDialog(Text, _crawl, _report);

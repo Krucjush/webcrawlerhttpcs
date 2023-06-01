@@ -12,36 +12,60 @@ using System.Windows;
 
 namespace webcrawlerhttp
 {
+	/// <summary>
+	/// Represents a class that performs crawling of web pages and collects information for generating reports.
+	/// </summary>
 	public class Crawl : IReportData
 	{
+		/// <summary>
+		/// Gets or sets the dictionary of pages and their hit counts.
+		/// </summary>
 		public Dictionary<string, int> Pages { get; set; }
+		/// <summary>
+		/// Gets or sets the count of external links.
+		/// </summary>
 		public int ExternalLinksCount { get; set; }
+		/// <summary>
+		/// Gets or sets the count of internal links.
+		/// </summary>
 		public int InternalLinksCount { get; set; }
-		public async Task<Crawl> CrawlPage(string baseURL, string currentURL, Crawl crawl)
+		/// <summary>
+		/// Crawls the specified web page and collects information for generating reports.
+		/// </summary>
+		/// <param name="baseUrl">The base URL of the website.</param>
+		/// <param name="currentUrl">The URL of the current page to crawl.</param>
+		/// <param name="crawl">The crawl object to store the crawling results.</param>
+		/// <returns>The crawl object with updated information.</returns>
+		public async Task<Crawl> CrawlPage(string baseUrl, string currentUrl, Crawl crawl)
 		{
-			var baseURLObj = new Uri(baseURL);
-			var currentURLObj = new Uri(currentURL);
-			if (baseURLObj.Host != currentURLObj.Host)
+			// If this is an offsite URL, bail immediately
+			var baseUrlObj = new Uri(baseUrl);
+			var currentUrlObj = new Uri(currentUrl);
+			if (baseUrlObj.Host != currentUrlObj.Host)
 			{
 				return crawl;
 			}
 
-			var normalizedCurrentURL = NormalizeURL(currentURL);
-			if (crawl.Pages.TryGetValue(normalizedCurrentURL, out int count))
+			var normalizedCurrentUrl = NormalizeUrl(currentUrl);
+
+			// if the page was already visited, just increase the count and don't repeat the http request
+			if (crawl.Pages.TryGetValue(normalizedCurrentUrl, out var count))
 			{
-				crawl.Pages[normalizedCurrentURL] = count + 1;
+				crawl.Pages[normalizedCurrentUrl] = count + 1;
 				return crawl;
 			}
 
-			crawl.Pages[normalizedCurrentURL] = 1;
+			// initialize this page in the map since it doesn't exist yet
+			crawl.Pages[normalizedCurrentUrl] = 1;
 
+			// fetch and parse the html of the currentURL
 			//MessageBox.Show($"actively crawling {currentURL}");
 
 			try
 			{
 				var httpClient = new HttpClient();
 				httpClient.Timeout = TimeSpan.FromSeconds(10);
-				var resp = await httpClient.GetAsync(currentURL);
+				var resp = await httpClient.GetAsync(currentUrl);
 				if ((int)resp.StatusCode > 399)
 				{
 					//MessageBox.Show($"error in fetch with status code: {(int)resp.StatusCode} on page: {currentURL}");
@@ -57,11 +81,11 @@ namespace webcrawlerhttp
 
 				var htmlBody = await resp.Content.ReadAsStringAsync();
 
-				var nextURLs = GetURLsFromHTML(htmlBody, baseURL);
+				var nextUrLs = GetUrLsFromHtml(htmlBody, baseUrl);
 
-				foreach (var nextURL in nextURLs)
+				foreach (var nextUrl in nextUrLs)
 				{
-					if (IsInternalLink(baseURL, nextURL))
+					if (IsInternalLink(baseUrl, nextUrl))
 					{
 						crawl.InternalLinksCount++;
 					}
@@ -69,7 +93,7 @@ namespace webcrawlerhttp
 					{
 						crawl.ExternalLinksCount++;
 					}
-					crawl = await CrawlPage(baseURL, nextURL, crawl);
+					crawl = await CrawlPage(baseUrl, nextUrl, crawl);
 
 				}
 			}
@@ -79,54 +103,63 @@ namespace webcrawlerhttp
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"error in fetch: {ex.Message}, on page {currentURL}");
+				MessageBox.Show($"error in fetch: {ex.Message}, on page {currentUrl}");
 			}
 			return crawl;
 		}
 
-		public List<string> GetURLsFromHTML(string htmlBody, string baseURL)
+		/// <summary>
+		/// Retrieves URLs from the HTML body of a web page.
+		/// </summary>
+		/// <param name="htmlBody">The HTML body of the web page.</param>
+		/// <param name="baseUrl">The base URL of the web page.</param>
+		/// <returns>A list of URLs extracted from the HTML body.</returns>
+		public List<string> GetUrLsFromHtml(string htmlBody, string baseUrl)
 		{
 			var urls = new List<string>();
 			var dom = new HtmlDocument();
 			dom.LoadHtml(htmlBody);
 			var linkElements = dom.DocumentNode.SelectNodes("//a");
-			if (linkElements != null)
+			if (linkElements == null) return urls;
+			foreach ( var linkElement in linkElements )
 			{
-				foreach ( var linkElement in linkElements )
+				var href = linkElement.GetAttributeValue("href", "");
+				if (href.Substring(0, 1) == "/")
 				{
-					string href = linkElement.GetAttributeValue("href", "");
-					if (href.Substring(0, 1) == "/")
+					//relative
+					try
 					{
-						//relative
-						try
-						{
-							var urlObj = new Uri(baseURL + href);
-							urls.Add(urlObj.Scheme + "://" + urlObj.Host + urlObj.AbsolutePath);
-						}
-						catch (Exception err)
-						{
-							//MessageBox.Show($"error with relative url:\n{err.Message}");
-						}
+						var urlObj = new Uri(baseUrl + href);
+						urls.Add(urlObj.Scheme + "://" + urlObj.Host + urlObj.AbsolutePath);
 					}
-					else
+					catch (Exception err)
 					{
-						//absolute
-						try
-						{
-							var urlObj = new Uri(href);
-							urls.Add(urlObj.Scheme + "://" + urlObj.Host + urlObj.AbsolutePath);
-						}
-						catch (Exception err)
-						{
-							//MessageBox.Show($"error with absolute url:\n{err.Message}");
-						}
+						//MessageBox.Show($"error with relative url:\n{err.Message}");
+					}
+				}
+				else
+				{
+					//absolute
+					try
+					{
+						var urlObj = new Uri(href);
+						urls.Add(urlObj.Scheme + "://" + urlObj.Host + urlObj.AbsolutePath);
+					}
+					catch (Exception err)
+					{
+						//MessageBox.Show($"error with absolute url:\n{err.Message}");
 					}
 				}
 			}
 			return urls;
 		}
 
-		public string NormalizeURL(string urlString)
+		/// <summary>
+		/// Normalizes a URL by removing trailing slashes.
+		/// </summary>
+		/// <param name="urlString">The URL string to normalize.</param>
+		/// <returns>The normalized URL.</returns>
+		public string NormalizeUrl(string urlString)
 		{
 			var urlObj = new Uri(urlString);
 			var hostPath = $"{urlObj.Host}{urlObj.AbsolutePath}";
@@ -137,9 +170,15 @@ namespace webcrawlerhttp
 			return hostPath;
 		}
 
-		public bool IsInternalLink(string baseURL, string link)
+		/// <summary>
+		/// Determines whether a link is an internal link based on the base URL.
+		/// </summary>
+		/// <param name="baseUrl">The base URL of the website.</param>
+		/// <param name="link">The link URL to check.</param>
+		/// <returns>True if the link is an internal link; otherwise, false.</returns>
+		public bool IsInternalLink(string baseUrl, string link)
 		{
-			var baseUri = new Uri(baseURL);
+			var baseUri = new Uri(baseUrl);
 			var linkUri = new Uri(link);
 			return baseUri.Host == linkUri.Host;
 		}

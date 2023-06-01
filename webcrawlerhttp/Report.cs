@@ -12,26 +12,30 @@ using System.Xml.Serialization;
 
 namespace webcrawlerhttp
 {
+	/// <summary>
+	/// Represents a class that generates and saves reports.
+	/// </summary>
 	public class Report
 	{
-		private System.Windows.Forms.SaveFileDialog SaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+		private readonly System.Windows.Forms.SaveFileDialog _saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 
+		/// <summary>
+		/// Generates an XML report based on the provided report data.
+		/// </summary>
+		/// <typeparam name="T">The type of report data.</typeparam>
+		/// <param name="reportData">The report data.</param>
+		/// <returns>The generated XML report as a string.</returns>
 		public string GenerateXmlReport<T>(T reportData) where T : IReportData
 		{
 			var xmlContent = new XElement("Report");
 
 			var sortedPages = SortPages(reportData.Pages);
 
-			foreach (var sortedPage in sortedPages)
+			foreach (var pageElement in from sortedPage in sortedPages let url = sortedPage.Key let hits = sortedPage.Value select new XElement("Page",
+				         new XElement("URL", url),
+				         new XElement("Hits", hits)
+			         ))
 			{
-				var url = sortedPage.Key;
-				var hits = sortedPage.Value;
-
-				var pageElement = new XElement("Page",
-					new XElement("URL", url),
-					new XElement("Hits", hits)
-				);
-
 				xmlContent.Add(pageElement);
 			}
 
@@ -41,15 +45,20 @@ namespace webcrawlerhttp
 			return xmlContent.ToString();
 		}
 
+		/// <summary>
+		/// Saves the report as XML to the specified file path.
+		/// </summary>
+		/// <param name="pages">The report pages as an XML string.</param>
+		/// <returns>A task representing the asynchronous operation.</returns>
 		public async Task SaveReportAsXml(string pages)
 		{
-			SaveFileDialog.Filter = "XML File|*.xml";
-			SaveFileDialog.Title = "Save Report as XML";
-			SaveFileDialog.FileName = "report.xml"; // Default file name
+			_saveFileDialog.Filter = "XML File|*.xml";
+			_saveFileDialog.Title = "Save Report as XML";
+			_saveFileDialog.FileName = "report.xml"; // Default file name
 
-			if (SaveFileDialog.ShowDialog() == DialogResult.OK)
+			if (_saveFileDialog.ShowDialog() == DialogResult.OK)
 			{
-				var filePath = SaveFileDialog.FileName;
+				var filePath = _saveFileDialog.FileName;
 
 				try
 				{
@@ -66,6 +75,12 @@ namespace webcrawlerhttp
 			}
 		}
 
+		/// <summary>
+		/// Generates a JSON report based on the provided crawl data.
+		/// </summary>
+		/// <typeparam name="T">The type of crawl data.</typeparam>
+		/// <param name="crawl">The crawl data.</param>
+		/// <returns>The generated JSON report as a dictionary.</returns>
 		public Dictionary<string, int> GenerateJsonReport<T>(T crawl) where T : IReportData
 		{
 			var report = new Dictionary<string, int>();
@@ -83,19 +98,24 @@ namespace webcrawlerhttp
 			return report;
 		}
 
+		/// <summary>
+		/// Saves the report as JSON to the specified file path.
+		/// </summary>
+		/// <param name="pages">The report pages as a dictionary.</param>
+		/// <returns>A task representing the asynchronous operation.</returns>
 		public async Task SaveReportAsJson(Dictionary<string, int> pages)
 		{
-			SaveFileDialog.Filter = "JSON File|*.json";
-			SaveFileDialog.Title = "Save Report as JSON";
-			SaveFileDialog.FileName = "report.json"; // Default file name
+			_saveFileDialog.Filter = "JSON File|*.json";
+			_saveFileDialog.Title = "Save Report as JSON";
+			_saveFileDialog.FileName = "report.json"; // Default file name
 			var jsonSettings = new JsonSerializerSettings
 			{
 				StringEscapeHandling = StringEscapeHandling.EscapeHtml
 			};
 
-			if (SaveFileDialog.ShowDialog() == DialogResult.OK)
+			if (_saveFileDialog.ShowDialog() == DialogResult.OK)
 			{
-				var filePath = SaveFileDialog.FileName;
+				var filePath = _saveFileDialog.FileName;
 
 				try
 				{
@@ -113,6 +133,12 @@ namespace webcrawlerhttp
 			}
 		}
 
+		/// <summary>
+		/// Generates a CSV report based on the provided crawl data.
+		/// </summary>
+		/// <typeparam name="T">The type of crawl data.</typeparam>
+		/// <param name="crawl">The crawl data.</param>
+		/// <returns>The generated CSV report as a string.</returns>
 		public string GenerateCsvReport<T>(T crawl) where T : IReportData
 		{
 			var csvContent = "URL,Hits\n";
@@ -131,15 +157,20 @@ namespace webcrawlerhttp
 			return csvContent;
 		}
 
+		/// <summary>
+		/// Saves the report as CSV to the specified file path.
+		/// </summary>
+		/// <param name="csvContent">The report content as a CSV string.</param>
+		/// <returns>A task representing the asynchronous operation.</returns>
 		public async Task SaveReportAsCsv(string csvContent)
 		{
-			SaveFileDialog.Filter = "CSV File|*.csv";
-			SaveFileDialog.Title = "Save Report as CSV";
-			SaveFileDialog.FileName = "report.csv"; // Default file name
+			_saveFileDialog.Filter = "CSV File|*.csv";
+			_saveFileDialog.Title = "Save Report as CSV";
+			_saveFileDialog.FileName = "report.csv"; // Default file name
 
-			if (SaveFileDialog.ShowDialog() == DialogResult.OK)
+			if (_saveFileDialog.ShowDialog() == DialogResult.OK)
 			{
-				var filePath = SaveFileDialog.FileName;
+				var filePath = _saveFileDialog.FileName;
 
 				try
 				{
@@ -156,6 +187,12 @@ namespace webcrawlerhttp
 			}
 		}
 
+		/// <summary>
+		/// Prints the report based on the provided crawl data.
+		/// </summary>
+		/// <typeparam name="T">The type of crawl data.</typeparam>
+		/// <param name="crawl">The crawl data.</param>
+		/// <returns>The printed report as a string.</returns>
 		public string PrintReport<T>(T crawl) where T : IReportData
 		{
 			var output = "=========\n" +
@@ -176,7 +213,12 @@ namespace webcrawlerhttp
 							 "END REPORT\n" +
 							 "=========\n";
 		}
-		
+
+		/// <summary>
+		/// Sorts the pages in the report based on the number of hits.
+		/// </summary>
+		/// <param name="pages">The dictionary of pages to sort.</param>
+		/// <returns>The sorted dictionary of pages.</returns>
 		public Dictionary<string, int> SortPages(Dictionary<string, int> pages)
 		{
 			var sortedURLs = pages.OrderByDescending(q => q.Value)
